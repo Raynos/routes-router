@@ -30,5 +30,5 @@ function Router(opts) {
 
 function defaultNotFound(req, res) {
     res.statusCode = 404
-    res.end()
+    res.end("404 Not Found")
 }
