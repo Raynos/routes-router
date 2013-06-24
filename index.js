@@ -14,6 +14,11 @@ function Router(opts) {
     handleRequest.addRoute = function addRoute(uri, fn) {
         router.addRoute(uri, fn)
     }
+    handleRequest.routes = router.routes
+    handleRequest.routeMap = router.routeMap
+    handleRequest.match = function match(uri) {
+        return router.match(uri)
+    }
 
     return handleRequest
 
