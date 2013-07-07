@@ -1,17 +1,22 @@
 var RoutesRouter = require("routes").Router
 var url = require("url")
+var methods = require("http-methods")
+var sendError = require("send-data/error")
 
 module.exports = Router
 
 function Router(opts) {
-    if (typeof opts === "function") {
-        opts = { notFound: opts }
-    }
+    opts = opts || {}
 
-    var notFound = opts && opts.notFound || defaultNotFound
+    var notFound = opts.notFound || defaultNotFound
+    var errorHandler = opts.errorHandler || sendError
     var router = new RoutesRouter()
 
     handleRequest.addRoute = function addRoute(uri, fn) {
+        if (typeof fn === "object") {
+            fn = methods(fn)
+        }
+
         router.addRoute(uri, fn)
     }
     handleRequest.routes = router.routes
@@ -29,7 +34,14 @@ function Router(opts) {
             return notFound(req, res)
         }
 
-        route.fn(req, res, route.params, route.splats)
+        route.fn(req, res, {
+            params: route.params,
+            splats: route.splats
+        }, function (err) {
+            if (err) {
+                errorHandler(req, res, err)
+            }
+        })
     }
 }
 

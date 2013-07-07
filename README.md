@@ -1,9 +1,6 @@
 # routes-router
 
 [![dependency status][3]][4]
-<!-- [![build status][1]][2]  -->
-
-<!-- [![browser support][5]][6] -->
 
 Simplest router possible
 
@@ -21,8 +18,17 @@ router.addRoute("/foo", function (req, res) {
     res.end("hello!")
 })
 
-router.addRoute("/bars/:barName", function (req, res, params) {
-    res.end("you request bars " + params.barName)
+router.addRoute("/bars/:barName", function (req, res, opts) {
+    res.end("you request bars " + opts.params.barName)
+})
+
+router.addRoute("/baz/:things", {
+    GET: function (req, res) {
+        res.end("I will give you your thing")
+    },
+    POST: function (req, res) {
+        res.end("got your things")
+    }
 })
 ```
 
