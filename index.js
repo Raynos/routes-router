@@ -1,4 +1,4 @@
-var RoutesRouter = require("routes").Router
+var RoutesRouter = require("routes")
 var url = require("url")
 var methods = require("http-methods")
 var sendError = require("send-data/error")
