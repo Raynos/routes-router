@@ -2,6 +2,7 @@ var RoutesRouter = require("routes")
 var url = require("url")
 var methods = require("http-methods")
 var sendError = require("send-data/error")
+var extend = require("xtend")
 
 module.exports = Router
 
@@ -34,10 +35,12 @@ function Router(opts) {
             return notFound(req, res)
         }
 
-        route.fn(req, res, {
+        var opts = extend(route.params, {
             params: route.params,
             splats: route.splats
-        }, function (err) {
+        })
+
+        route.fn(req, res, opts, function (err) {
             if (err) {
                 errorHandler(req, res, err)
             }
