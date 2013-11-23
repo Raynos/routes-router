@@ -78,7 +78,7 @@ function Router(opts) {
 function defaultErrorHandler(req, res, err) {
     sendError(req, res, {
         body: err,
-        statusCode: err.statusCode || res.statusCode || 500
+        statusCode: err.statusCode || 500
     })
 }
 
