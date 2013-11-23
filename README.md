@@ -32,6 +32,43 @@ router.addRoute("/baz/:things", {
 })
 ```
 
+## Error handling with a router
+
+You can use a router to do central error handling
+
+```js
+var Router = require("routes-router")
+var sendError = require("send-data/error")
+var uuid = require("uuid")
+
+var router = Router({
+  errorHandler: function (req, res, err) {
+    err.id = uuid()
+
+    // log it somewhere
+    logError(req, res, err)
+
+    // if req is json
+    if (isJson(req)) {
+      sendError(req, res, err)
+    } else {
+      // render HTML 500 page
+      renderErrorPage(req, res, err)
+    }
+  },
+  teardown: function (req, res, err) {
+    // an unexcepted exception occured
+    // process is in corrupted state
+    // you have to shut it down
+    // see node domains docs
+  },
+  notFound: function (req, res) {
+    // render a custom 404 page
+    renderNotfoundPage(req, res)
+  }
+})
+```
+
 ## Installation
 
 `npm install routes-router`

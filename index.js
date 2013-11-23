@@ -10,7 +10,14 @@ function Router(opts) {
 
     var notFound = opts.notFound || defaultNotFound
     var errorHandler = opts.errorHandler || sendError
+    var teardown = opts.teardown || noop
+    var useDomains = opts.useDomains
+    var domain
     var router = new RoutesRouter()
+
+    if (useDomains) {
+        domain = require("domain")
+    }
 
     handleRequest.addRoute = function addRoute(uri, fn) {
         if (typeof fn === "object") {
@@ -28,20 +35,39 @@ function Router(opts) {
     return handleRequest
 
     function handleRequest(req, res) {
-        var route = router.match(url.parse(req.url).pathname)
+        if (useDomains) {
+            var d = domain.create()
+            d.add(req)
+            d.add(res)
 
-        if (!route) {
-            return notFound(req, res)
+            d.on("error", function (err) {
+                errorHandler(req, res, err)
+                teardown(req, res, err)
+            })
+
+            d.run(runRoute)
+        } else {
+            runRoute()
         }
 
-        route.fn(req, res, {
-            params: route.params,
-            splats: route.splats
-        }, function (err) {
+        function runRoute() {
+            var route = router.match(url.parse(req.url).pathname)
+
+            if (!route) {
+                return notFound(req, res)
+            }
+
+            route.fn(req, res, {
+                params: route.params,
+                splats: route.splats
+            }, handleError)
+        }
+
+        function handleError(err) {
             if (err) {
                 errorHandler(req, res, err)
             }
-        })
+        }
     }
 }
 
@@ -49,3 +75,5 @@ function defaultNotFound(req, res) {
     res.statusCode = 404
     res.end("404 Not Found")
 }
+
+function noop() {}
