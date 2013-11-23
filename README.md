@@ -79,9 +79,9 @@ var router = Router({
 
 ## MIT Licenced
 
-  [1]: https://secure.travis-ci.org/Colingo/routes-router.png
-  [2]: http://travis-ci.org/Colingo/routes-router
-  [3]: https://david-dm.org/Colingo/routes-router/status.png
-  [4]: https://david-dm.org/Colingo/routes-router
-  [5]: https://ci.testling.com/Colingo/routes-router.png
-  [6]: https://ci.testling.com/Colingo/routes-router
+  [1]: https://secure.travis-ci.org/Raynos/routes-router.png
+  [2]: http://travis-ci.org/Raynos/routes-router
+  [3]: https://david-dm.org/Raynos/routes-router/status.png
+  [4]: https://david-dm.org/Raynos/routes-router
+  [5]: https://ci.testling.com/Raynos/routes-router.png
+  [6]: https://ci.testling.com/Raynos/routes-router
