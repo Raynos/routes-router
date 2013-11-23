@@ -10,7 +10,7 @@ function Router(opts) {
     opts = opts || {}
 
     var notFound = opts.notFound || defaultNotFound
-    var errorHandler = opts.errorHandler || sendError
+    var errorHandler = opts.errorHandler || defaultErrorHandler
     var teardown = opts.teardown || noop
     var useDomains = opts.useDomains
     var domain
@@ -73,6 +73,13 @@ function Router(opts) {
             }
         }
     }
+}
+
+function defaultErrorHandler(req, res, err) {
+    sendError(req, res, {
+        body: err,
+        statusCode: err.statusCode || res.statusCode || 500
+    })
 }
 
 function defaultNotFound(req, res) {
