@@ -19,7 +19,15 @@ router.addRoute("/foo", function (req, res) {
 })
 
 router.addRoute("/bars/:barName", function (req, res, opts) {
-    res.end("you request bars " + opts.params.barName)
+    res.end("you request bars " + opts.barName)
+})
+
+router.addRoute("/foos/:fooName", function (req, res, opts, cb) {
+    db.get(opts.fooName, function (err, value) {
+        if (err) return cb(err)
+
+        res.end(JSON.stringify(value))
+    })
 })
 
 router.addRoute("/baz/:things", {
