@@ -32,6 +32,7 @@ function Router(opts) {
     handleRequest.match = function match(uri) {
         return router.match(uri)
     }
+    handleRequest.notFound = notFound
 
     return handleRequest
 
@@ -42,7 +43,7 @@ function Router(opts) {
             d.add(res)
 
             d.on("error", function (err) {
-                errorHandler(req, res, err)
+                errorHandler.call(handleRequest, req, res, err)
                 teardown(req, res, err)
             })
 
@@ -69,13 +70,17 @@ function Router(opts) {
 
         function handleError(err) {
             if (err) {
-                errorHandler(req, res, err)
+                errorHandler.call(handleRequest, req, res, err)
             }
         }
     }
 }
 
 function defaultErrorHandler(req, res, err) {
+    if (err.statusCode === 404) {
+        return this.notFound(req, res)
+    }
+
     sendError(req, res, {
         body: err,
         statusCode: err.statusCode || 500
