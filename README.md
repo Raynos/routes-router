@@ -78,6 +78,54 @@ var router = Router({
 })
 ```
 
+## Cascading errors in a tree of routers
+
+Since a `Router` just returns a `function (req, res) {}` you can 
+  add routers to a router
+
+Here we use a `ChildRouter` for the sub routes. The specifics of
+  a child router is that they have different default error
+  handlers and not found handlers. Their defaults will delegate
+  up the error to the parent router so you can define all error
+  handling globally
+
+```js
+var Router = require("routes-router")
+var ChildRouter = require("routes-router/child")
+
+var app = Router({
+  errorHandler: function (req, res) {
+    res.statusCode = 500
+    res.end("no u")
+  },
+  notFound: function (req, res) {
+    res.statusCode = 404
+    res.end("oh noes")
+  }
+})
+
+var users = ChildRouter()
+var posts = ChildRouter()
+
+app.addRoute("/user", users)
+app.addRoute("/post", posts)
+
+users.addRoute("/", function (req, res) {
+  res.end("all users")
+})
+users.addRoute("/:id", function (req, res, opts) {
+  res.end("user " + opts.id)
+})
+
+posts.addRoute("/", function (req, res) {
+  res.end("all posts")
+})
+posts.addRoute("/:id", function (req, res, opts) {
+  res.end("post " + opts.id)
+})
+```
+
+
 ## Installation
 
 `npm install routes-router`

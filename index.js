@@ -36,7 +36,7 @@ function Router(opts) {
 
     return handleRequest
 
-    function handleRequest(req, res) {
+    function handleRequest(req, res, parentOpts, parentCallback) {
         if (useDomains) {
             var d = domain.create()
             d.add(req)
@@ -56,7 +56,7 @@ function Router(opts) {
             var route = router.match(url.parse(req.url).pathname)
 
             if (!route) {
-                return notFound(req, res)
+                return notFound(req, res, {}, handleError)
             }
 
 
@@ -70,7 +70,8 @@ function Router(opts) {
 
         function handleError(err) {
             if (err) {
-                errorHandler.call(handleRequest, req, res, err)
+                errorHandler.call(
+                    handleRequest, req, res, err, {}, parentCallback)
             }
         }
     }
