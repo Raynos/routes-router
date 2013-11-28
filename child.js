@@ -5,6 +5,8 @@ module.exports = ChildRouter
 function ChildRouter(opts) {
     opts = opts || {}
 
+    var prefix = opts.prefix
+
     opts.notFound = function (req, res, opts, cb) {
         var err = new Error("404 Not Found")
         err.statusCode = 404
@@ -14,5 +16,14 @@ function ChildRouter(opts) {
         cb(err)
     }
 
-    return Router(opts)
+    var router = Router(opts)
+
+    if (prefix) {
+        var addRoute = router.addRoute
+        router.addRoute = function (uri, fn) {
+            addRoute(prefix + uri, fn)
+        }
+    }
+
+    return router
 }
