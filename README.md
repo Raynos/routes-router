@@ -107,8 +107,8 @@ var app = Router({
 var users = ChildRouter({ prefix: "/user" })
 var posts = ChildRouter({ prefix: "/post" })
 
-app.addRoute("/user", users)
-app.addRoute("/post", posts)
+app.addRoute("/user*?", users)
+app.addRoute("/post*?", posts)
 
 users.addRoute("/", function (req, res) {
   res.end("all users")
