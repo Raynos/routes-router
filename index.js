@@ -3,13 +3,15 @@ var url = require("url")
 var methods = require("http-methods")
 var sendError = require("send-data/error")
 var extend = require("xtend")
-var inherits = require('inherits')
+var inherits = require("inherits")
 
 module.exports = Router
 
 function NotFoundError(req) {
-    if (!(this instanceof NotFoundError)) return new NotFoundError(req)
-    Error.call(this, 'resource not found ' + JSON.stringify(req.url))
+    if (!(this instanceof NotFoundError)) {
+        return new NotFoundError(req)
+    }
+    Error.call(this, "resource not found " + JSON.stringify(req.url))
     this.url = req.url
 }
 
@@ -49,7 +51,7 @@ function Router(opts) {
     return handleRequest
 
     function handleRequest(req, res, opts, done) {
-        if (typeof opts === 'function') {
+        if (typeof opts === "function") {
             done = opts
             opts = null
         }
@@ -82,14 +84,18 @@ function Router(opts) {
 
         function runRoute() {
             var route = router.match(url.parse(req.url).pathname)
-            if (!route) return self.notFound(req, res, {}, callback)
+            if (!route) {
+                return self.notFound(req, res, {}, callback)
+            }
             var params = extend(route.params, {
                 params: route.params,
                 splats: route.splats
             })
             route.fn(req, res, params, callback)
             function callback(err) {
-                if (err) self.handleError(req, res, err, {}, done)
+                if (err) {
+                    self.handleError(req, res, err, {}, done)
+                }
             }
         }
     }
