@@ -3,8 +3,20 @@ var url = require("url")
 var methods = require("http-methods")
 var sendError = require("send-data/error")
 var extend = require("xtend")
+var inherits = require('inherits')
 
 module.exports = Router
+
+function NotFoundError(req) {
+    if (!(this instanceof NotFoundError)) return new NotFoundError(req)
+    Error.call(this, 'resource not found ' + JSON.stringify(req.url))
+    this.url = req.url
+}
+
+inherits(NotFoundError, Error)
+
+NotFoundError.prototype.statusCode = 404
+NotFoundError.prototype.notFound = true
 
 function Router(opts) {
     opts = opts || {}
@@ -33,20 +45,36 @@ function Router(opts) {
         return router.match(uri)
     }
     handleRequest.notFound = notFound
-
+    handleRequest.handleError = errorHandler
     return handleRequest
 
-    function handleRequest(req, res, parentOpts, parentCallback) {
+    function handleRequest(req, res, opts, done) {
+        if (typeof opts === 'function') {
+            done = opts
+            opts = null
+        }
+
+        var self
+        if (done) {
+            self = Object.create(handleRequest)
+            self.notFound = function(req, res) {
+                done(new NotFoundError(req))
+            }
+            self.handleError = function(req, res, err) {
+                done(err)
+            }
+        } else {
+            self = handleRequest
+        }
+
         if (useDomains) {
             var d = domain.create()
             d.add(req)
             d.add(res)
-
             d.on("error", function (err) {
-                errorHandler.call(handleRequest, req, res, err)
+                self.handleError(req, res, err)
                 teardown(req, res, err)
             })
-
             d.run(runRoute)
         } else {
             runRoute()
@@ -54,24 +82,14 @@ function Router(opts) {
 
         function runRoute() {
             var route = router.match(url.parse(req.url).pathname)
-
-            if (!route) {
-                return notFound(req, res, {}, handleError)
-            }
-
-
-            var opts = extend(route.params, {
+            if (!route) return self.notFound(req, res, {}, callback)
+            var params = extend(route.params, {
                 params: route.params,
                 splats: route.splats
             })
-
-            route.fn(req, res, opts, handleError)
-        }
-
-        function handleError(err) {
-            if (err) {
-                errorHandler.call(
-                    handleRequest, req, res, err, {}, parentCallback)
+            route.fn(req, res, params, callback)
+            function callback(err) {
+                if (err) self.handleError(req, res, err, {}, done)
             }
         }
     }
@@ -79,7 +97,12 @@ function Router(opts) {
 
 function defaultErrorHandler(req, res, err) {
     if (err.statusCode === 404) {
-        return this.notFound(req, res)
+        if (err.notFound) {
+            res.statusCode = 404
+            res.end("404 Not Found")
+        } else {
+            return this.notFound(req, res)
+        }
     }
 
     sendError(req, res, {
