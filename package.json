@@ -20,7 +20,8 @@
     "routes": "~0.2.0",
     "http-methods": "~0.1.0",
     "send-data": "~3.1.2",
-    "xtend": "~2.1.1"
+    "xtend": "~2.1.1",
+    "inherits": "^2.0.1"
   },
   "devDependencies": {
     "tape": "~0.2.2",
