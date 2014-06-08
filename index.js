@@ -9,7 +9,6 @@ module.exports = Router
 function Router(opts) {
     opts = opts || {}
 
-    var notFound = opts.notFound || defaultNotFound
     var errorHandler = opts.errorHandler || defaultErrorHandler
     var teardown = opts.teardown || noop
     var useDomains = opts.useDomains
@@ -32,7 +31,7 @@ function Router(opts) {
     handleRequest.match = function match(uri) {
         return router.match(uri)
     }
-    handleRequest.notFound = notFound
+    handleRequest.notFound = opts.notFound || defaultNotFound
 
     return handleRequest
 
@@ -56,7 +55,7 @@ function Router(opts) {
             var route = router.match(url.parse(req.url).pathname)
 
             if (!route) {
-                return notFound(req, res, {}, handleError)
+                return handleRequest.notFound(req, res, {}, handleError)
             }
 
 
