@@ -36,12 +36,14 @@ function Router(opts) {
     return handleRequest
 
     function handleRequest(req, res, opts, done) {
+        var self = handleRequest
+
         if (useDomains) {
             var d = domain.create()
             d.add(req)
             d.add(res)
             d.on("error", function (err) {
-                errorHandler.call(handleRequest, req, res, err)
+                errorHandler.call(self, req, res, err)
                 teardown(req, res, err)
             })
             d.run(runRoute)
@@ -59,8 +61,7 @@ function Router(opts) {
             route.fn(req, res, params, callback)
             function callback(err) {
                 if (err) {
-                    errorHandler.call(
-                        handleRequest, req, res, err, {}, done)
+                    errorHandler.call(self, req, res, err, {}, done)
                 }
             }
         }
