@@ -57,6 +57,9 @@ function Router(opts) {
         var self
         if (done) {
             self = Object.create(handleRequest)
+            self.notFound = function(req, res) {
+                done(new NotFoundError(req))
+            }
             self.handleError = function(req, res, err) {
                 done(err)
             }
