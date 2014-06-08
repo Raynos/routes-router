@@ -94,7 +94,12 @@ function Router(opts) {
 
 function defaultErrorHandler(req, res, err) {
     if (err.statusCode === 404) {
-        return this.notFound(req, res)
+        if (err.notFound) {
+            res.statusCode = 404
+            res.end("404 Not Found")
+        } else {
+            return this.notFound(req, res)
+        }
     }
 
     sendError(req, res, {
