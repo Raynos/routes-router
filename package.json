@@ -20,7 +20,7 @@
     "http-methods": "~0.1.0",
     "inherits": "^2.0.1",
     "routes": "~0.2.0",
-    "send-data": "^3.2.0",
+    "send-data": "^3.2.3",
     "xtend": "~2.1.1"
   },
   "devDependencies": {
@@ -28,6 +28,7 @@
     "istanbul": "^0.2.10",
     "jshint": "^2.5.1",
     "opn": "^0.1.2",
+    "pre-commit": "0.0.7",
     "process": "^0.7.0",
     "request": "^2.36.0",
     "tap-spec": "^0.2.0",

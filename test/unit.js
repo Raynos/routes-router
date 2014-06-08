@@ -72,8 +72,6 @@ test("can call match() on router", function (assert) {
     var match1 = router.match("/")
     var match2 = router.match("/foo")
 
-    console.log("match", match1, match2)
-
     assert.deepEqual(match1, {
         params: {},
         splats: [],
@@ -124,4 +122,23 @@ test("hit defaultErrorHandler", function (assert) {
             assert.end()
         })
     )
+})
+
+test("hit callback with no errors", function (assert) {
+    var router = Router()
+
+    router.addRoute("/", function (req, res, opts, cb) {
+        res.end("oh hi")
+        cb()
+    })
+
+    router(
+        new MockRequest({ uri: "/" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "oh hi")
+
+            assert.end()
+        }))
 })

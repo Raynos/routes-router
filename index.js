@@ -23,7 +23,7 @@ function Router(opts) {
 
     var notFound = opts.notFound || defaultNotFound;
     var errorHandler = opts.errorHandler || defaultErrorHandler;
-    var teardown = opts.teardown || noop;
+    var teardown = opts.teardown || rethrow;
     var useDomains = opts.useDomains;
     var domain;
     var router = new RoutesRouter();
@@ -72,10 +72,24 @@ function Router(opts) {
             d.add(req);
             d.add(res);
             d.on("error", function (err) {
-                self.handleError(req, res, err);
-                teardown(req, res, err);
+                err.handlingError = null
+                try {
+                    self.handleError(req, res, err);
+                } catch (error) {
+                    err.handlingError = error
+                    if (!res.finished) {
+                        res.end()
+                    }
+                }
+                d.exit();
+                teardown(err);
             });
-            d.run(runRoute);
+            try {
+                d.run(runRoute);
+            } catch (error) {
+                d.exit()
+                d.emit("error", error)
+            }
         } else {
             runRoute();
         }
@@ -120,4 +134,8 @@ function defaultNotFound(req, res) {
     res.end("404 Not Found");
 }
 
-function noop() {}
+function rethrow(err) {
+    process.nextTick(function () {
+        throw err
+    })
+}
