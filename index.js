@@ -37,6 +37,11 @@ function Router(opts) {
     return handleRequest
 
     function handleRequest(req, res, opts, done) {
+        if (typeof opts === 'function') {
+            done = opts
+            opts = null
+        }
+
         var self
         if (done) {
             self = Object.create(handleRequest)
