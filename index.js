@@ -8,9 +8,6 @@ var inherits = require("inherits");
 module.exports = Router;
 
 function NotFoundError(req) {
-    if (!(this instanceof NotFoundError)) {
-        return new NotFoundError(req);
-    }
     Error.call(this, "resource not found " +
         JSON.stringify(req.url));
     this.url = req.url;

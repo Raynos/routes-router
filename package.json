@@ -17,15 +17,17 @@
     "email": "raynos2@gmail.com"
   },
   "dependencies": {
-    "routes": "~0.2.0",
     "http-methods": "~0.1.0",
-    "send-data": "~3.1.2",
-    "xtend": "~2.1.1",
-    "inherits": "^2.0.1"
+    "inherits": "^2.0.1",
+    "routes": "~0.2.0",
+    "send-data": "^3.2.0",
+    "xtend": "~2.1.1"
   },
   "devDependencies": {
     "hammock": "^0.1.6",
+    "istanbul": "^0.2.10",
     "jshint": "^2.5.1",
+    "opn": "^0.1.2",
     "process": "^0.7.0",
     "request": "^2.36.0",
     "tap-spec": "^0.2.0",
@@ -39,7 +41,9 @@
   ],
   "scripts": {
     "jshint": "jshint .",
-    "test": "npm run jshint && node ./test/index.js | tap-spec"
+    "test": "npm run jshint && node ./test/index.js | tap-spec",
+    "cover": "istanbul cover --report none --print detail test/index.js",
+    "view-cover": "istanbul report html && opn ./coverage/index.html"
   },
   "testling": {
     "files": "test/index.js",
