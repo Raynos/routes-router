@@ -37,7 +37,15 @@ function Router(opts) {
     return handleRequest
 
     function handleRequest(req, res, opts, done) {
-        var self = handleRequest
+        var self
+        if (done) {
+            self = Object.create(handleRequest)
+            self.handleError = function(req, res, err) {
+                done(err)
+            }
+        } else {
+            self = handleRequest
+        }
 
         if (useDomains) {
             var d = domain.create()
