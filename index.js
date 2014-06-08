@@ -33,6 +33,7 @@ function Router(opts) {
         return router.match(uri)
     }
     handleRequest.notFound = notFound
+    handleRequest.handleError = errorHandler
     return handleRequest
 
     function handleRequest(req, res, opts, done) {
@@ -43,7 +44,7 @@ function Router(opts) {
             d.add(req)
             d.add(res)
             d.on("error", function (err) {
-                errorHandler.call(self, req, res, err)
+                self.handleError(req, res, err)
                 teardown(req, res, err)
             })
             d.run(runRoute)
@@ -53,16 +54,14 @@ function Router(opts) {
 
         function runRoute() {
             var route = router.match(url.parse(req.url).pathname)
-            if (!route) return notFound(req, res, {}, callback)
+            if (!route) return self.notFound(req, res, {}, callback)
             var params = extend(route.params, {
                 params: route.params,
                 splats: route.splats
             })
             route.fn(req, res, params, callback)
             function callback(err) {
-                if (err) {
-                    errorHandler.call(self, req, res, err, {}, done)
-                }
+                if (err) self.handleError(req, res, err, {}, done)
             }
         }
     }
