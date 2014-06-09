@@ -136,6 +136,10 @@ function defaultNotFound(req, res) {
 
 function rethrow(err) {
     process.nextTick(function () {
+        // fix the process.domain stack
+        if (process.domain) {
+            process.domain.exit()
+        }
         throw err
     })
 }
