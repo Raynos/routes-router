@@ -142,3 +142,22 @@ test("hit callback with no errors", function (assert) {
             assert.end()
         }))
 })
+
+test("can pass in options", function (assert) {
+    var router = Router()
+
+    router.addRoute("/lulz", function (req, res, opts) {
+        assert.equal(opts.foo, "bar")
+        res.end("winning " + opts.foo)
+    })
+
+    router(
+        new MockRequest({ url: "/lulz" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "winning bar")
+            assert.end()
+        }),
+        { foo: "bar" })
+})

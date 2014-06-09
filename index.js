@@ -99,7 +99,7 @@ function Router(opts) {
             if (!route) {
                 return self.notFound(req, res, {}, callback);
             }
-            var params = extend(route.params, {
+            var params = extend(opts, route.params, {
                 params: route.params,
                 splats: route.splats
             });
