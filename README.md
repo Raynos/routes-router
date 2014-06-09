@@ -73,8 +73,7 @@ var router = Router({
   notFound: function (req, res) {
     // render a custom 404 page
     renderNotfoundPage(req, res)
-  },
-  useDomains: true
+  }
 })
 ```
 

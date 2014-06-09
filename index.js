@@ -1,9 +1,10 @@
 var RoutesRouter = require("routes");
 var url = require("url");
 var methods = require("http-methods");
-var sendError = require("send-data/error");
 var extend = require("xtend");
 var TypedError = require("error/typed")
+
+var createDefaultHandler = require("./default-handler.js")
 
 var NotFound = TypedError({
     statusCode: 404,
@@ -16,17 +17,10 @@ module.exports = Router;
 function Router(opts) {
     opts = opts || {};
 
-    var notFound = opts.notFound || defaultNotFound
-    var errorHandler = opts.errorHandler || defaultErrorHandler
-    var teardown = opts.teardown || rethrow;
-    var useDomains = opts.useDomains;
-    var domain;
+    var defaultHandler = createDefaultHandler(opts)
     var router = RoutesRouter();
 
-    if (useDomains) {
-        domain = require("domain");
-    }
-
+    handleRequest.defaultHandler = defaultHandler
     handleRequest.addRoute = function addRoute(uri, fn) {
         if (typeof fn === "object") {
             fn = methods(fn);
@@ -46,13 +40,10 @@ function Router(opts) {
         }
 
         opts = opts || {}
-        callback = callback || defaultHandler
+        callback = callback ||
+            defaultHandler.createHandler(req, res)
 
-        if (useDomains) {
-            runDomain();
-        } else {
-            runRoute();
-        }
+        runRoute();
 
         function runRoute() {
             var pathname
@@ -81,62 +72,5 @@ function Router(opts) {
 
             route.fn(req, res, params, callback);
         }
-
-        function runDomain() {
-            var d = domain.create();
-            d.add(req);
-            d.add(res);
-            d.on("error", function (err) {
-                err.handlingError = null
-                try {
-                    callback(err);
-                } catch (error) {
-                    err.handlingError = error
-                    if (!res.finished) {
-                        res.end()
-                    }
-                }
-                d.exit();
-                teardown(err);
-            });
-            try {
-                d.run(runRoute);
-            } catch (error) {
-                d.exit()
-                d.emit("error", error)
-            }
-        }
-
-        function defaultHandler(err) {
-            if (err) {
-                if (err.statusCode === 404) {
-                    return notFound(req, res)
-                }
-
-                errorHandler(req, res, err)
-            }
-        }
     }
-}
-
-function defaultErrorHandler(req, res, err) {
-    sendError(req, res, {
-        body: err,
-        statusCode: err.statusCode || 500
-    });
-}
-
-function defaultNotFound(req, res) {
-    res.statusCode = 404;
-    res.end("404 Not Found");
-}
-
-function rethrow(err) {
-    process.nextTick(function () {
-        // fix the process.domain stack
-        if (process.domain) {
-            process.domain.exit()
-        }
-        throw err
-    })
 }

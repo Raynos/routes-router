@@ -2,10 +2,10 @@ var test = require("tape")
 var MockRequest = require("hammock/request")
 var MockResponse = require("hammock/response")
 
-var Router = require("../index")
+var DomainRouter = require("../domain")
 
 test("use domains", function (assert) {
-    var router = Router({ useDomains: true })
+    var router = DomainRouter()
 
     router.addRoute("/hello", function (req, res) {
         res.end("world")
@@ -23,7 +23,7 @@ test("use domains", function (assert) {
 })
 
 test("throw an exception async in handler", function (assert) {
-    var router = Router({ useDomains: true, teardown: noop })
+    var router = DomainRouter({ teardown: noop })
 
     router.addRoute("/throw", function () {
         process.nextTick(function () {
@@ -50,7 +50,7 @@ test("throw an exception async in handler", function (assert) {
 })
 
 test("throw an exception in handler", function (assert) {
-    var router = Router({ useDomains: true, teardown: noop })
+    var router = DomainRouter({ teardown: noop })
 
     router.addRoute("/throw", function () {
         throw new Error("lulz no")
@@ -76,8 +76,7 @@ test("throw an exception in handler", function (assert) {
 
 test("add a teardown handler", function (assert) {
     var called = 0
-    var router = Router({
-        useDomains: true,
+    var router = DomainRouter({
         teardown: function (err) {
             assert.ok(err)
             assert.equal(called, 1)
@@ -102,7 +101,7 @@ test("add a teardown handler", function (assert) {
 })
 
 test("emitting error on req", function (assert) {
-    var router = Router({ useDomains: true, teardown: noop })
+    var router = DomainRouter({ teardown: noop })
 
     router.addRoute("/throw", function (req) {
         req.emit("error", new Error("lulz no"))
@@ -127,7 +126,7 @@ test("emitting error on req", function (assert) {
 })
 
 test("emitting error on res", function (assert) {
-    var router = Router({ useDomains: true, teardown: noop })
+    var router = DomainRouter({ teardown: noop })
 
     router.addRoute("/throw", function (req, res) {
         res.emit("error", new Error("lulz no"))
@@ -156,8 +155,7 @@ test("emitting error on res", function (assert) {
 test("throwing an exception in the domain error handler", function (assert) {
     var errorHandler = false
     var response = false
-    var router = Router({
-        useDomains: true,
+    var router = DomainRouter({
         teardown: function (err) {
             assert.ok(err)
 
@@ -198,7 +196,7 @@ test("throwing an exception in the domain error handler", function (assert) {
 })
 
 test("goes to uncaught by default", function (assert) {
-    var router = Router({ useDomains: true })
+    var router = DomainRouter()
     var called = false
 
     var listeners = process._events.uncaughtException
