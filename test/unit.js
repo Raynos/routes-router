@@ -72,11 +72,13 @@ test("can call match() on router", function (assert) {
     var match1 = router.match("/")
     var match2 = router.match("/foo")
 
+    delete match1.next
+
     assert.deepEqual(match1, {
         params: {},
         splats: [],
         route: "/",
-        fn: homeRoute
+        fn: homeRoute,
     })
     assert.equal(match2, undefined)
 

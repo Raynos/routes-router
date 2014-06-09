@@ -2,7 +2,6 @@ var test = require("tape")
 var http = require("http")
 var request = require("request")
 var Router = require("../index.js")
-var ChildRouter = require("../child.js")
 
 var server
 var PORT = 10000 + Math.floor(Math.random() * 20000)
@@ -20,8 +19,8 @@ test("setup a server", function (assert) {
         }
     })
 
-    var users = ChildRouter({ prefix: "/user" })
-    var posts = ChildRouter({ prefix: "/post" })
+    var users = Router()
+    var posts = Router()
 
     app.addRoute("/user*?", users)
     app.addRoute("/post*?", posts)
