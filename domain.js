@@ -1,62 +1,72 @@
-var domain = require("domain");
+var domain = require("domain")
+var inherits = require("inherits")
+var mutableExtend = require("xtend/mutable")
 
-var Router = require("./index.js")
-
-module.exports = DomainRouter
+var Router = require("./index.js").Router
 
 function DomainRouter(opts) {
+    if (!(this instanceof DomainRouter)) {
+        return new DomainRouter(opts)
+    }
+
     opts = opts || {}
 
-    var teardown = opts.teardown || rethrow;
+    Router.call(this, opts)
 
-    var router = Router(opts)
+    this.teardown = opts.teardown || rethrow
+}
 
-    handleRequest.addRoute = router.addRoute
-    handleRequest.routes = router.routes
-    handleRequest.routeMap = router.routeMap
-    handleRequest.match = router.match
-    handleRequest.defaultHandler = router.defaultHandler
-    return handleRequest
+inherits(DomainRouter, Router)
 
+DomainRouter.prototype.handleRequest =
     function handleRequest(req, res, opts, callback) {
         if (typeof opts === "function") {
-            callback = opts;
-            opts = null;
+            callback = opts
+            opts = null
         }
 
+        var self = this
         opts = opts || {}
-        callback = callback || handleRequest.defaultHandler
+        callback = callback || this.defaultHandler
             .createHandler(req, res)
 
-        runDomain()
-
-        function runDomain() {
-            var d = domain.create();
-            d.add(req);
-            d.add(res);
-            d.on("error", function (err) {
-                err.handlingError = null
-                try {
-                    callback(err);
-                } catch (error) {
-                    err.handlingError = error
-                    if (!res.finished) {
-                        res.end()
-                    }
-                }
-                d.exit();
-                teardown(err);
-            });
+        var d = domain.create()
+        d.add(req)
+        d.add(res)
+        d.on("error", function (err) {
+            err.handlingError = null
             try {
-                d.run(function () {
-                    router(req, res, opts, callback)
-                });
+                callback(err)
             } catch (error) {
-                d.exit()
-                d.emit("error", error)
+                err.handlingError = error
+                if (!res.finished) {
+                    res.end()
+                }
             }
+            d.exit()
+            self.teardown(err)
+        });
+        try {
+            d.run(function () {
+                Router.prototype.handleRequest.call(self,
+                    req, res, opts, callback)
+            })
+        } catch (error) {
+            d.exit()
+            d.emit("error", error)
         }
     }
+
+module.exports = createRouter
+
+function createRouter(opts) {
+    var router = DomainRouter(opts)
+
+    var handleRequest = router.handleRequest.bind(router)
+    return mutableExtend(handleRequest, router, {
+        addRoute: router.addRoute,
+        handleRequest: router.handleRequest
+    })
 }
 
 
