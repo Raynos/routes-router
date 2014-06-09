@@ -45,7 +45,7 @@ Router.prototype.handleRequest =
         var self = this
         opts = opts || {}
         callback = callback ||
-            this.defaultHandler.createHandler(req, res)
+            this.defaultHandler.bind(null, req, res)
 
         var pathname
 

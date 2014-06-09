@@ -27,8 +27,8 @@ DomainRouter.prototype.handleRequest =
 
         var self = this
         opts = opts || {}
-        callback = callback || this.defaultHandler
-            .createHandler(req, res)
+        callback = callback ||
+            this.defaultHandler.bind(null, req, res)
 
         var d = domain.create()
         d.add(req)

@@ -6,21 +6,15 @@ function createDefaultHandler(opts) {
     var notFound = opts.notFound || defaultNotFound
     var errorHandler = opts.errorHandler || defaultErrorHandler
 
-    return {
-        createHandler: createHandler
-    }
+    return defaultHandler
 
-    function createHandler(req, res) {
-        return defaultHandler
-
-        function defaultHandler(err) {
-            if (err) {
-                if (err.statusCode === 404) {
-                    return notFound(req, res)
-                }
-
-                errorHandler(req, res, err)
+    function defaultHandler(req, res, err) {
+        if (err) {
+            if (err.statusCode === 404) {
+                return notFound(req, res)
             }
+
+            errorHandler(req, res, err)
         }
     }
 }
