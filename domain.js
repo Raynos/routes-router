@@ -46,15 +46,11 @@ DomainRouter.prototype.handleRequest =
             d.exit()
             self.teardown(err)
         });
-        try {
-            d.run(function () {
-                Router.prototype.handleRequest.call(self,
-                    req, res, opts, callback)
-            })
-        } catch (error) {
-            d.exit()
-            d.emit("error", error)
-        }
+
+        d.run(function () {
+            Router.prototype.handleRequest.call(self,
+                req, res, opts, callback)
+        })
     }
 
 module.exports = createRouter
