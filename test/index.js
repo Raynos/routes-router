@@ -1,4 +1,5 @@
 require("./unit.js")
+require("./prefix-tests")
 require("./simple-routes.js")
 require("./child-routes.js")
 require("./domains.js")

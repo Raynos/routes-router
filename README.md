@@ -82,15 +82,19 @@ var router = Router({
 Since a `Router` just returns a `function (req, res) {}` you can 
   add routers to a router
 
-Here we use a `ChildRouter` for the sub routes. The specifics of
-  a child router is that they have different default error
-  handlers and not found handlers. Their defaults will delegate
-  up the error to the parent router so you can define all error
-  handling globally
+Here we can just embed a `Router` instance in another router
+  instance. A child router will the parents routers callback
+  so all error handling is managed in the parent, not the child.
+
+This means you can define your error handling in your parent
+  and all children will re-use that error handling logic.
+
+Note that we use the `.prefix()` instead of `.addRoute()` 
+  method to add child routers. The `.prefix()` ensures that
+  both `/user`, `/user/` and `/user/*?` goes to the child router.
 
 ```js
 var Router = require("routes-router")
-var ChildRouter = require("routes-router/child")
 
 var app = Router({
   errorHandler: function (req, res) {
@@ -103,11 +107,11 @@ var app = Router({
   }
 })
 
-var users = ChildRouter({ prefix: "/user" })
-var posts = ChildRouter({ prefix: "/post" })
+var users = Router()
+var posts = Router()
 
-app.addRoute("/user*?", users)
-app.addRoute("/post*?", posts)
+app.prefix("/user", users)
+app.prefix("/post", posts)
 
 users.addRoute("/", function (req, res) {
   res.end("all users")

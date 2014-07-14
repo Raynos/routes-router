@@ -35,6 +35,16 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
     this.router.addRoute(uri, fn)
 }
 
+Router.prototype.prefix = function prefix(uri, fn) {
+    var pattern = uri + "*?"
+    this.router.addRoute(pattern, function (req, res, opts) {
+        if (opts.splats[0] === undefined) {
+            opts.splats[0] = "/"
+        }
+        fn.apply(this, arguments)
+    })
+}
+
 Router.prototype.handleRequest =
     function handleRequest(req, res, opts, callback) {
         if (typeof opts === "function") {
@@ -84,6 +94,7 @@ function createRouter(opts) {
     var handleRequest = router.handleRequest.bind(router)
     return mutableExtend(handleRequest, router, {
         addRoute: router.addRoute,
+        prefix: router.prefix,
         handleRequest: router.handleRequest
     })
 }
