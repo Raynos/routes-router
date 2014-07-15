@@ -2,7 +2,7 @@
 
 [![dependency status][3]][4]
 
-Simplest router possible
+Simplest request handler possible
 
 ## Example
 
