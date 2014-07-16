@@ -72,10 +72,13 @@ Router.prototype.handleRequest =
         opts.params = opts.params || {}
         opts.splats = opts.splats || []
 
+        var uri
+
         if (opts.splats && opts.splats.length) {
-            pathname = opts.splats.pop()
+            pathname = opts.splats.pop();
         } else {
-            pathname = url.parse(req.url).pathname
+            uri = url.parse(req.url);
+            pathname = uri.pathname;
         }
 
         var route = this.router.match(pathname)
@@ -90,6 +93,10 @@ Router.prototype.handleRequest =
             params: extend(opts.params, route.params),
             splats: opts.splats.concat(route.splats)
         })
+
+        if (uri) {
+            params.parsedUrl = uri
+        }
 
         route.fn(req, res, params, callback)
     }

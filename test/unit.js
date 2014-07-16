@@ -163,3 +163,20 @@ test("can pass in options", function (assert) {
         }),
         { foo: "bar" })
 })
+
+test("opts has parsedUrl", function (assert) {
+    var router = Router()
+
+    router.addRoute("/foo", function (req, res, opts) {
+        res.end(opts.parsedUrl.query)
+    })
+
+    router(
+        MockRequest({ url: "/foo?hello=there" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "hello=there")
+            assert.end()
+        }))
+})
