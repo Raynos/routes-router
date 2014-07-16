@@ -63,7 +63,6 @@ Router.prototype.handleRequest =
             opts = null
         }
 
-        var self = this
         opts = opts || {}
         callback = callback ||
             this.defaultHandler.bind(null, req, res)
@@ -79,7 +78,7 @@ Router.prototype.handleRequest =
             pathname = url.parse(req.url).pathname
         }
 
-        var route = self.router.match(pathname)
+        var route = this.router.match(pathname)
 
         if (!route) {
             return callback(NotFound({
