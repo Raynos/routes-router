@@ -76,7 +76,7 @@ Router.prototype.handleRequest =
             }))
         }
 
-        var params = extend(opts, route.params, {
+        var params = extend(opts, {
             params: extend(opts.params, route.params),
             splats: opts.splats.concat(route.splats)
         })

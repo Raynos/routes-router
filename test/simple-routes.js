@@ -21,11 +21,11 @@ test("setup a server", function (assert) {
     })
 
     router.addRoute("/bars/:barName", function (req, res, opts) {
-        res.end("you request bars " + opts.barName)
+        res.end("you request bars " + opts.params.barName)
     })
 
     router.addRoute("/foos/:fooName", function (req, res, opts, cb) {
-        db.get(opts.fooName, function (err, value) {
+        db.get(opts.params.fooName, function (err, value) {
             if (err) {
                 return cb(err)
             }
