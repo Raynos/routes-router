@@ -36,13 +36,24 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
 }
 
 Router.prototype.prefix = function prefix(uri, fn) {
-    var pattern = uri + "*?"
-    this.router.addRoute(pattern, function (req, res, opts) {
+    var pattern = uri + "/*?";
+
+    this.router.addRoute(uri, normalizeSplatsFromUri);
+    this.router.addRoute(pattern, normalizeSplatsFromPattern);
+
+    function normalizeSplatsFromUri(req, res, opts) {
         if (opts.splats[0] === undefined) {
-            opts.splats[0] = "/"
+            opts.splats[0] = "/";
         }
-        fn.apply(this, arguments)
-    })
+        fn.apply(this, arguments);
+    }
+
+    function normalizeSplatsFromPattern(req, res, opts) {
+        if (typeof opts.splats[0] === "string") {
+            opts.splats[0] = "/" + opts.splats[0];
+        }
+        fn.apply(this, arguments);
+    }
 }
 
 Router.prototype.handleRequest =

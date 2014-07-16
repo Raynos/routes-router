@@ -94,3 +94,27 @@ test("child not found handler", function (assert) {
                 }))
         }))
 })
+
+test("child should not be greedy", function (assert) {
+    var child = Router()
+    child.addRoute("*", function (req, resp) {
+        resp.end("all the dogs")
+    })
+
+    var parent = Router()
+
+    parent.prefix("/dog", child)
+    parent.addRoute("/doge", function (req, resp) {
+        resp.end("doge")
+    })
+
+    parent(
+        MockRequest({ url: "/doge" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "doge")
+
+            assert.end()
+        }))
+})
