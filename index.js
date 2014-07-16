@@ -42,15 +42,19 @@ Router.prototype.prefix = function prefix(uri, fn) {
     this.router.addRoute(pattern, normalizeSplatsFromPattern);
 
     function normalizeSplatsFromUri(req, res, opts) {
-        if (opts.splats[0] === undefined) {
-            opts.splats[0] = "/";
+        var last = opts.splats.length ?
+            opts.splats.length - 1 : 0;
+        if (opts.splats[last] === undefined) {
+            opts.splats[last] = "/";
         }
         fn.apply(this, arguments);
     }
 
     function normalizeSplatsFromPattern(req, res, opts) {
-        if (typeof opts.splats[0] === "string") {
-            opts.splats[0] = "/" + opts.splats[0];
+        var last = opts.splats.length ?
+            opts.splats.length - 1 : 0;
+        if (typeof opts.splats[last] === "string") {
+            opts.splats[last] = "/" + opts.splats[last];
         }
         fn.apply(this, arguments);
     }
