@@ -94,3 +94,55 @@ test("child not found handler", function (assert) {
                 }))
         }))
 })
+
+test("child should not be greedy", function (assert) {
+    var child = Router()
+    child.addRoute("*", function (req, resp) {
+        resp.end("all the dogs")
+    })
+
+    var parent = Router()
+
+    parent.prefix("/dog", child)
+    parent.addRoute("/doge", function (req, resp) {
+        resp.end("doge")
+    })
+
+    parent(
+        MockRequest({ url: "/doge" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "doge")
+
+            assert.end()
+        }))
+})
+
+test("child inherits params", function (assert) {
+    var child = Router()
+    child.addRoute("/:five/*/eight", function (req, resp, opts) {
+        resp.end("two: " + opts.params.two +
+            " three: " + opts.splats[0] +
+            " five: " + opts.params.five +
+            " six: " + opts.splats[1])
+    })
+
+    var parent = Router()
+
+    parent.prefix("/one/:two/*/four", child)
+
+    var url = "/one/two/three/four/five/six/seven/eight"
+
+    parent(
+        MockRequest({ url: url }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err);
+
+            assert.equal(resp.body,
+                "two: two three: three " +
+                "five: five six: six/seven")
+
+            assert.end()
+        }))
+})

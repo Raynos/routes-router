@@ -19,11 +19,11 @@ router.addRoute("/foo", function (req, res) {
 })
 
 router.addRoute("/bars/:barName", function (req, res, opts) {
-    res.end("you request bars " + opts.barName)
+    res.end("you request bars " + opts.params.barName)
 })
 
 router.addRoute("/foos/:fooName", function (req, res, opts, cb) {
-    db.get(opts.fooName, function (err, value) {
+    db.get(opts.params.fooName, function (err, value) {
         if (err) return cb(err)
 
         res.end(JSON.stringify(value))
@@ -117,14 +117,14 @@ users.addRoute("/", function (req, res) {
   res.end("all users")
 })
 users.addRoute("/:id", function (req, res, opts) {
-  res.end("user " + opts.id)
+  res.end("user " + opts.params.id)
 })
 
 posts.addRoute("/", function (req, res) {
   res.end("all posts")
 })
 posts.addRoute("/:id", function (req, res, opts) {
-  res.end("post " + opts.id)
+  res.end("post " + opts.params.id)
 })
 ```
 

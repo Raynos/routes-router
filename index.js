@@ -36,13 +36,28 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
 }
 
 Router.prototype.prefix = function prefix(uri, fn) {
-    var pattern = uri + "*?"
-    this.router.addRoute(pattern, function (req, res, opts) {
-        if (opts.splats[0] === undefined) {
-            opts.splats[0] = "/"
+    var pattern = uri + "/*?";
+
+    this.router.addRoute(uri, normalizeSplatsFromUri);
+    this.router.addRoute(pattern, normalizeSplatsFromPattern);
+
+    function normalizeSplatsFromUri(req, res, opts) {
+        var last = opts.splats.length ?
+            opts.splats.length - 1 : 0;
+        if (opts.splats[last] === undefined) {
+            opts.splats[last] = "/";
         }
-        fn.apply(this, arguments)
-    })
+        fn.apply(this, arguments);
+    }
+
+    function normalizeSplatsFromPattern(req, res, opts) {
+        var last = opts.splats.length ?
+            opts.splats.length - 1 : 0;
+        if (typeof opts.splats[last] === "string") {
+            opts.splats[last] = "/" + opts.splats[last];
+        }
+        fn.apply(this, arguments);
+    }
 }
 
 Router.prototype.handleRequest =
@@ -52,7 +67,6 @@ Router.prototype.handleRequest =
             opts = null
         }
 
-        var self = this
         opts = opts || {}
         callback = callback ||
             this.defaultHandler.bind(null, req, res)
@@ -62,13 +76,16 @@ Router.prototype.handleRequest =
         opts.params = opts.params || {}
         opts.splats = opts.splats || []
 
+        var uri
+
         if (opts.splats && opts.splats.length) {
-            pathname = opts.splats.pop()
+            pathname = opts.splats.pop();
         } else {
-            pathname = url.parse(req.url).pathname
+            uri = url.parse(req.url);
+            pathname = uri.pathname;
         }
 
-        var route = self.router.match(pathname)
+        var route = this.router.match(pathname)
 
         if (!route) {
             return callback(NotFound({
@@ -76,10 +93,14 @@ Router.prototype.handleRequest =
             }))
         }
 
-        var params = extend(opts, route.params, {
+        var params = extend(opts, {
             params: extend(opts.params, route.params),
             splats: opts.splats.concat(route.splats)
         })
+
+        if (uri) {
+            params.parsedUrl = uri
+        }
 
         route.fn(req, res, params, callback)
     }

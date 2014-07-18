@@ -29,18 +29,18 @@ test("setup a server", function (assert) {
         res.end("all users")
     })
     users.addRoute("/:id", function (req, res, opts) {
-        res.end("user " + opts.id)
+        res.end("user " + opts.params.id)
     })
 
     posts.addRoute("/", function (req, res) {
         res.end("all posts")
     })
     posts.addRoute("/:id", function (req, res, opts, cb) {
-        if (opts.id === "0") {
+        if (opts.params.id === "0") {
             cb(new Error("lulz"))
         }
 
-        res.end("post " + opts.id)
+        res.end("post " + opts.params.id)
     })
 
     server = http.createServer(app)
