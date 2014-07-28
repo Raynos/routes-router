@@ -61,6 +61,10 @@ Router.prototype.prefix = function prefix(uri, fn) {
 
     var pattern = uri + "/*?";
 
+    if (typeof fn === "object") {
+        fn = methods(fn)
+    }
+
     this.router.addRoute(uri, normalizeSplatsFromUri);
     this.router.addRoute(pattern, normalizeSplatsFromPattern);
 

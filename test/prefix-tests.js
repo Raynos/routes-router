@@ -70,6 +70,35 @@ test("prefix complains about lack of leading slash", function (assert) {
     assert.end()
 })
 
+test("prefix supports object format", function (assert) {
+    var router = Router()
+    router.prefix("/foo", {
+        POST: function (req, res) {
+            res.end("oh hi")
+        }
+    })
+
+    router(
+        MockRequest({ method: "POST", url: "/foo" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "oh hi")
+
+            router(
+                MockRequest({ url: "/foo" }),
+                MockResponse(function (err, resp) {
+                    assert.ifError(err)
+
+                    assert.equal(resp.statusCode, 405)
+                    assert.equal(resp.body,
+                        "405 Method Not Allowed /foo")
+
+                    assert.end()
+                }))
+        }))
+})
+
 test("prefix supports nested uris", function (assert) {
     var router = createRouters()
 
