@@ -32,14 +32,50 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
         fn = methods(fn)
     }
 
+    var msg;
+    if (this.router.routeMap[uri]) {
+        msg = 'routes-router: Cannot add route, route already ' +
+            'exists.\n' +
+            'You\'ve called `router.addRoute("' + uri + '")` ' +
+            'twice.\n'
+        throw new Error(msg)
+    }
+
     this.router.addRoute(uri, fn)
 }
 
 Router.prototype.prefix = function prefix(uri, fn) {
+    var msg;
+    if (typeof uri !== 'string') {
+        msg = 'routes-router: must call ' +
+            '`router.prefix("/some-prefix", fn)`'
+        throw new Error(msg)
+    }
+
+    if (uri[uri.length - 1] === '/') {
+        msg = 'routes-router: ' +
+            '`routes.prefix("/some-prefix/", fn)` is ' +
+            'invalid.\n' +
+            'Passing a trailing slash does not work.\n';
+        throw new Error(msg)
+    }
+
+    if (uri[0] !== '/') {
+        msg = 'routes-router: ' +
+            '`routes.prefix("some-prefix", fn)` is ' +
+            'invalid.\n' +
+            'Must start "some-prefix" with a leading slash.\n'
+        throw new Error(msg)
+    }
+
     var pattern = uri + "/*?";
 
-    this.router.addRoute(uri, normalizeSplatsFromUri);
-    this.router.addRoute(pattern, normalizeSplatsFromPattern);
+    if (typeof fn === "object") {
+        fn = methods(fn)
+    }
+
+    this.addRoute(uri, normalizeSplatsFromUri);
+    this.addRoute(pattern, normalizeSplatsFromPattern);
 
     function normalizeSplatsFromUri(req, res, opts) {
         var last = opts.splats.length ?

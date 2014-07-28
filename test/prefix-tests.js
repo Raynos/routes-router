@@ -11,6 +11,9 @@ function createRouters() {
     child.addRoute("/bar", function (req, res) {
         res.end(req.url)
     })
+    child.addRoute("/:id", function (req, res, opts) {
+        res.end(req.url + ", " + opts.params.id)
+    })
 
     var parent = Router()
 
@@ -32,6 +35,68 @@ test("can add prefix router", function (assert) {
             assert.end()
         })
     )
+})
+
+test("prefix shows about no route", function (assert) {
+    var router = Router()
+    var errorRegex = /router\.prefix\(\"\/some\-prefix\", fn\)/
+
+    assert.throws(function () {
+        router.prefix()
+    }, errorRegex)
+
+    assert.end()
+})
+
+test("prefix complains about trailing slash", function (assert) {
+    var router = Router()
+    var errorRegex = /Passing a trailing slash does not work/
+
+    assert.throws(function () {
+        router.prefix("/trailingSlash/")
+    }, errorRegex)
+    
+    assert.end()
+})
+
+test("prefix complains about lack of leading slash", function (assert) {
+    var router = Router()
+    var errorRegex = /Must start "some-prefix" with a leading slash/
+
+    assert.throws(function () {
+        router.prefix("leadingSlashMissing")
+    }, errorRegex)
+
+    assert.end()
+})
+
+test("prefix supports object format", function (assert) {
+    var router = Router()
+    router.prefix("/foo", {
+        POST: function (req, res) {
+            res.end("oh hi")
+        }
+    })
+
+    router(
+        MockRequest({ method: "POST", url: "/foo" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "oh hi")
+
+            router(
+                MockRequest({ url: "/foo" }),
+                MockResponse(function (err, resp) {
+                    assert.ifError(err)
+
+                    assert.equal(resp.statusCode, 405)
+                    assert.equal(resp.body,
+                        "405 Method Not Allowed /foo")
+
+                    assert.end()
+                }))
+        }))
 })
 
 test("prefix supports nested uris", function (assert) {
@@ -58,6 +123,21 @@ test("prefix supports root uris", function (assert) {
             assert.ifError(err)
 
             assert.equal(resp.body, "/foo")
+
+            assert.end()
+        })
+    )
+})
+
+test("supports :id in nested router", function (assert) {
+    var router = createRouters()
+
+    router(
+        MockRequest({ url: "/foo/baz" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "/foo/baz, baz")
 
             assert.end()
         })
