@@ -11,6 +11,9 @@ function createRouters() {
     child.addRoute("/bar", function (req, res) {
         res.end(req.url)
     })
+    child.addRoute("/:id", function (req, res, opts) {
+        res.end(req.url + ", " + opts.params.id)
+    })
 
     var parent = Router()
 
@@ -80,6 +83,21 @@ test("prefix supports root uris", function (assert) {
             assert.ifError(err)
 
             assert.equal(resp.body, "/foo")
+
+            assert.end()
+        })
+    )
+})
+
+test("supports :id in nested router", function (assert) {
+    var router = createRouters()
+
+    router(
+        MockRequest({ url: "/foo/baz" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "/foo/baz, baz")
 
             assert.end()
         })
