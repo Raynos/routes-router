@@ -36,6 +36,21 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
 }
 
 Router.prototype.prefix = function prefix(uri, fn) {
+    var msg;
+    if (typeof uri !== 'string') {
+        msg = 'routes-router: must call ' +
+            '`router.prefix("/some-prefix", fn)`'
+        throw new Error(msg)
+    }
+
+    if (uri[uri.length - 1] === '/') {
+        msg = 'routes-router: ' +
+            '`routes.prefix("/some-prefix/", fn)` is ' +
+            'invalid.\n' +
+            'Passing a trailing slash does not work.\n';
+        throw new Error(msg)
+    }
+
     var pattern = uri + "/*?";
 
     this.router.addRoute(uri, normalizeSplatsFromUri);

@@ -34,6 +34,28 @@ test("can add prefix router", function (assert) {
     )
 })
 
+test("prefix shows about no route", function (assert) {
+    var router = Router()
+    var errorRegex = /router\.prefix\(\"\/some\-prefix\", fn\)/
+
+    assert.throws(function () {
+        router.prefix()
+    }, errorRegex)
+
+    assert.end()
+})
+
+test("prefix complains about trailing slash", function (assert) {
+    var router = Router()
+    var errorRegex = /Passing a trailing slash does not work/
+
+    assert.throws(function () {
+        router.prefix("/trailingSlash/")
+    }, errorRegex)
+    
+    assert.end()
+})
+
 test("prefix supports nested uris", function (assert) {
     var router = createRouters()
 
