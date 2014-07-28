@@ -32,6 +32,15 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
         fn = methods(fn)
     }
 
+    var msg;
+    if (this.router.routeMap[uri]) {
+        msg = 'routes-router: Cannot add route, route already ' +
+            'exists.\n' +
+            'You\'ve called `router.addRoute("' + uri + '")` ' +
+            'twice.\n'
+        throw new Error(msg)
+    }
+
     this.router.addRoute(uri, fn)
 }
 
@@ -65,8 +74,8 @@ Router.prototype.prefix = function prefix(uri, fn) {
         fn = methods(fn)
     }
 
-    this.router.addRoute(uri, normalizeSplatsFromUri);
-    this.router.addRoute(pattern, normalizeSplatsFromPattern);
+    this.addRoute(uri, normalizeSplatsFromUri);
+    this.addRoute(pattern, normalizeSplatsFromPattern);
 
     function normalizeSplatsFromUri(req, res, opts) {
         var last = opts.splats.length ?
