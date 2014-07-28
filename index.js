@@ -51,6 +51,14 @@ Router.prototype.prefix = function prefix(uri, fn) {
         throw new Error(msg)
     }
 
+    if (uri[0] !== '/') {
+        msg = 'routes-router: ' +
+            '`routes.prefix("some-prefix", fn)` is ' +
+            'invalid.\n' +
+            'Must start "some-prefix" with a leading slash.\n'
+        throw new Error(msg)
+    }
+
     var pattern = uri + "/*?";
 
     this.router.addRoute(uri, normalizeSplatsFromUri);

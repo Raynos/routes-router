@@ -59,6 +59,17 @@ test("prefix complains about trailing slash", function (assert) {
     assert.end()
 })
 
+test("prefix complains about lack of leading slash", function (assert) {
+    var router = Router()
+    var errorRegex = /Must start "some-prefix" with a leading slash/
+
+    assert.throws(function () {
+        router.prefix("leadingSlashMissing")
+    }, errorRegex)
+
+    assert.end()
+})
+
 test("prefix supports nested uris", function (assert) {
     var router = createRouters()
 
