@@ -52,7 +52,7 @@ Router.prototype.prefix = function prefix(uri, fn) {
         throw new Error(msg)
     }
 
-    if (uri[uri.length - 1] === '/') {
+    if (uri[uri.length - 1] === '/' && uri.length > 1) {
         msg = 'routes-router: ' +
             '`routes.prefix("/some-prefix/", fn)` is ' +
             'invalid.\n' +
@@ -68,7 +68,7 @@ Router.prototype.prefix = function prefix(uri, fn) {
         throw new Error(msg)
     }
 
-    var pattern = uri + "/*?";
+    var pattern = uri === "/" ? "/*?" : uri + "/*?";
 
     if (typeof fn === "object") {
         fn = methods(fn)
