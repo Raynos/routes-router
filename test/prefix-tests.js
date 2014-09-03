@@ -226,3 +226,52 @@ test("child inherits params", function (assert) {
             assert.end()
         }))
 })
+
+test("can prefix at /", function (assert) {
+    var child = Router()
+    child.addRoute("/", function (req, resp) {
+        resp.end("/")
+    })
+    child.addRoute("/foo", function (req, resp) {
+        resp.end("/foo")
+    })
+    child.addRoute("/:id", function (req, resp) {
+        resp.end("/:id")
+    })
+
+    var parent = Router()
+    parent.prefix("/", child)
+
+    request(parent, {
+        url: "/"
+    }, function (err, resp) {
+        assert.ifError(err)
+
+        assert.equal(resp.body, "/")
+
+        request(parent, {
+            url: "/foo"
+        }, function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "/foo")
+
+            request(parent, {
+                url: "/bar"
+            }, function (err, resp) {
+                assert.ifError(err)
+
+                assert.equal(resp.body, "/:id")
+
+                assert.end()
+            })
+
+        })
+    })
+})
+
+function request(handler, req, cb) {
+    handler(
+        MockRequest(req),
+        MockResponse(cb));
+}
