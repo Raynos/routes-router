@@ -83,7 +83,7 @@ Since a `Router` just returns a `function (req, res) {}` you can
   add routers to a router
 
 Here we can just embed a `Router` instance in another router
-  instance. A child router will the parents routers callback
+  instance. A child router will use the parent router's callback
   so all error handling is managed in the parent, not the child.
 
 This means you can define your error handling in your parent
