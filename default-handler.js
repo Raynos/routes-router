@@ -11,7 +11,7 @@ function createDefaultHandler(opts) {
     function defaultHandler(req, res, err) {
         if (err) {
             if (err.statusCode === 404) {
-                return notFound(req, res)
+                return notFound(req, res, err)
             }
 
             errorHandler(req, res, err)
