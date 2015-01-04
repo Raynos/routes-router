@@ -1,8 +1,10 @@
 # routes-router
 
-[![dependency status][3]][4]
+[![deprecated](http://hughsk.github.io/stability-badges/dist/deprecated.svg)](http://github.com/hughsk/stability-badges) [![dependency status][3]][4]
 
 Simplest request handler possible
+
+# **DEPRECATED** Use [http-hash-router](https://github.com/Matt-Esch/http-hash-router) instead
 
 ## Example
 
