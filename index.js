@@ -44,6 +44,10 @@ Router.prototype.addRoute = function addRoute(uri, fn) {
     this.router.addRoute(uri, fn)
 }
 
+Router.prototype.removeRoute = function removeRoute(uri) {
+    this.router.removeRoute(uri);
+}
+
 Router.prototype.prefix = function prefix(uri, fn) {
     var msg;
     if (typeof uri !== 'string') {
@@ -151,6 +155,7 @@ function createRouter(opts) {
     var handleRequest = router.handleRequest.bind(router)
     return mutableExtend(handleRequest, router, {
         addRoute: router.addRoute,
+        removeRoute: router.removeRoute,
         prefix: router.prefix,
         handleRequest: router.handleRequest
     })
