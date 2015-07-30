@@ -180,3 +180,38 @@ test("opts has parsedUrl", function (assert) {
             assert.end()
         }))
 })
+
+test("can call removeRoute() on router", function (assert) {
+    var router = Router()
+
+    router.addRoute("/win", function (req, res) {
+        res.end("winning")
+    })
+
+    router.addRoute("/lose", function (req, res) {
+        res.end("losing")
+    })
+
+    router.removeRoute("/lose");
+
+    router(
+        new MockRequest({ url: "/win" }),
+        new MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.body, "winning")
+        })
+    )
+
+    router(
+        new MockRequest({ uri: "/lose" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+
+            assert.equal(resp.statusCode, 404)
+            assert.equal(resp.body, "404 Not Found")
+
+            assert.end()
+        })
+    )
+})
