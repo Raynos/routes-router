@@ -181,6 +181,27 @@ test("opts has parsedUrl", function (assert) {
         }))
 })
 
+test("preHandleHook is called", function(assert) {
+var router = Router();
+
+    router.addRoute("/foo", function (req, res, opts) {
+        res.end(opts.route.route);
+    });
+
+    var opts = {};
+    opts.preHandleHook = function preHandleHook(params) {
+        params.reqOpts.params.route = params.reqOpts.route;
+    };
+    router(
+        MockRequest({ url: "/foo?hello=there" }),
+        MockResponse(function (err, resp) {
+            assert.ifError(err)
+            assert.equal(resp.body, "/foo")
+            assert.end()
+        }),
+        opts);
+})
+
 test("can call removeRoute() on router", function (assert) {
     var router = Router()
 
