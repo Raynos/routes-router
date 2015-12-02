@@ -107,7 +107,7 @@ Router.prototype.handleRequest =
             opts = null
         }
 
-        opts = opts || {}
+        opts = opts || {};
         callback = callback ||
             this.defaultHandler.bind(null, req, res)
 
@@ -125,7 +125,7 @@ Router.prototype.handleRequest =
             pathname = uri.pathname;
         }
 
-        var route = this.router.match(pathname)
+        var route = this.router.match(pathname);
 
         if (!route) {
             return callback(NotFound({
@@ -139,10 +139,23 @@ Router.prototype.handleRequest =
         })
 
         if (uri) {
-            params.parsedUrl = uri
+            params.parsedUrl = uri;
         }
 
-        route.fn(req, res, params, callback)
+        if (typeof opts.preHandleHook === 'function') {
+            var reqOpts = {
+                route: route,
+                params: params,
+                opts: opts
+            };
+            opts.preHandleHook({
+                req: req,
+                reqOpts: reqOpts
+            });
+            route.fn(req, res, params, callback);
+        } else {
+            route.fn(req, res, params, callback);
+        }
     }
 
 createRouter.Router = Router
