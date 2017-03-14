@@ -92,7 +92,7 @@ test("prefix supports object format", function (assert) {
 
                     assert.equal(resp.statusCode, 405)
                     assert.equal(resp.body,
-                        "405 Method Not Allowed /foo")
+                        "405 Method Not Allowed")
 
                     assert.end()
                 }))
