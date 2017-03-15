@@ -12,8 +12,9 @@ function createDefaultHandler(opts) {
         if (err) {
             if (err.statusCode === 404) {
                 return notFound(req, res, err)
+            } else if (err.statusCode === 405) {
+                return methodNotAllowed(req, res, err)
             }
-
             errorHandler(req, res, err)
         }
     }
@@ -29,4 +30,9 @@ function defaultErrorHandler(req, res, err) {
 function defaultNotFound(req, res) {
     res.statusCode = 404
     res.end("404 Not Found")
+}
+
+function methodNotAllowed(req, res, err) {
+    res.statusCode = err.statusCode
+    res.end(err.message)
 }

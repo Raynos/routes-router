@@ -19,7 +19,7 @@
   "dependencies": {
     "error": "^3.0.0",
     "hammock": "^0.1.9",
-    "http-methods": "~0.1.0",
+    "http-methods": "~1.1.0",
     "httperr": "^0.5.0",
     "inherits": "^2.0.1",
     "routes": "^2.1.0",
